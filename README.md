@@ -2,7 +2,9 @@
 A Proxy Based Implementation Of Object.observe, Array.observe plus Object.deepObserve.
 
 Object.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec.
+
 Array.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec.
+
 Object.deepObserve goes beyond the EcmaScript spec and implements the ability to observe an object and all its sub-objects with a single call.
 
 # Installation
@@ -37,6 +39,7 @@ Anyway, now you have a choice MaxArt2501, Joel Griffith or AnyWhichWay, and choi
 # What's Implemented and Not
 
 You can observe for ["add", "update", "delete", "reconfigure", "setPrototype","preventExtensions"] using Object.observe.
+
 You can observe for ["add", "update", "delete", "splice"] using Array.observe.
 
 Object.getNotifier and Object.deliverChangeRecords are not implemented.
@@ -45,8 +48,13 @@ Currently Object.deepObserve does not support event type selectivity. All events
 
 # Release History
 
-v0.01 2015-10-01 Initial release. No unit tests yet. Consider this a BETA.
+v0.03 2015-10-01 Updated README. No unit tests yet. Consider this a BETA.
+
 v0.02 2015-10-01 Added Object.deepObserve and Array.observe. No unit tests yet. Consider this a BETA.
+
+v0.01 2015-10-01 Initial release. No unit tests yet. Consider this a BETA.
+
+
 
 # License
 
