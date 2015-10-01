@@ -1,2 +1,49 @@
 # proxy-observe
-A Proxy based implementation of Object.observe
+A Proxy Based Implementation Of Object.observe
+
+Object.observe polyfill based on subset of the EcmaScript 7 spec. Read the documentation for more detailed information.
+
+# Installation
+
+There is no npm installation since the Chrome engine used to run node.js includes Object.observe.
+
+So, just copy the contents of dist/proxy-observe.js to your local machine and include it like you would any Javascript file. If your browser does not support a Proxy object, then you will need to get a shim for that.
+
+# Philosophy
+
+There is a more complete EcmaScript implementation available at https://github.com/MaxArt2501/object-observe. This is probably the most popular Object.observe polyfill available at the moment. However, it has well documented and acknowledged shortcomings. It is based on polling which means some events get delivered out of order or even missed. It's author provides a reasonable rationale for not using Proxies to implement Object.observe.
+
+The above being said, we had an application that could not afford to miss events or have them out of order and we also wanted something lighter and potentially faster. Hence, we built a Proxy based polyfill. Although it is not yet as broadly used and others have not yet had the time to provide feedback; as far as we know the sole shortcomings of our implementation are:
+
+1) There are some less used functions not yet implemented, e.g. deliverChangeRecords.
+2) The variables pointing to objects that are being observed must be re-assigned to point to a proxy returned by the call to Object.observe, e.g.
+
+var object = { foo: null };
+object = Object.observe(object,function(changeset) { console.log(changeset));
+object.foo = "bar";
+
+will result in {foo: "bar"} being printed to the console
+
+Item one above can be re-mediated over time (Hopefully the browswer vendors will finish implementing the spec and we won't have to do this re-mediation). 
+
+We believe item two is a small price to pay. Our implementation is also less than 100 lines of code vs. over 500 lines of code for MaxArt2501.
+
+There is an additional implementation at https://github.com/joelgriffith/object-observe-es5. This implementation is synchronous and modifies all object properties to have custom getters and setters. This could really bind up your application if there are a lot of changes to objects. It also only monitors enumerable properties and like the MaxArt2501 implementation several hundred lines of code.
+
+Anyway, now you have a choice MaxArt2501, Joel Griffith or AnyWhichWay, and choice is good! They all have their pros and cons.
+
+# What's Implemented and Not
+
+You can observe for ["add", "update", "delete", "reconfigure", "setPrototype"] but not for ["preventExtensions"].
+
+Array.observe is not yet implemented, but with the Proxy approach this will not be difficult.
+
+Object.getNotifier and Object.deliverChangeRecords are not implemented.
+
+# Release History
+
+v0.01 2015-10-01 Initial release. No unit tests yet.
+
+# License
+
+MIT License - see LICENSE file
