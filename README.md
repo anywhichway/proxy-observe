@@ -28,7 +28,7 @@ will result in {foo: "bar"} being printed to the console
 
 Item one above can be re-mediated over time (Hopefully the browswer vendors will finish implementing the spec and we won't have to do this re-mediation). 
 
-We believe item two is a small price to pay. Our implementation is also less than 175 lines of code including Array.observe and Object.deepObserve vs. over 500 lines of code for MaxArt2501 covering just Object.observe.
+We believe item two is a small price to pay. Our implementation is also less than 175 lines of code and 3K including Array.observe and Object.deepObserve vs. over 500 lines of code and 28K for MaxArt2501 covering just Object.observe.
 
 There is an additional implementation at https://github.com/joelgriffith/object-observe-es5. This implementation is synchronous and modifies all object properties to have custom getters and setters. This could really bind up your application if there are a lot of changes to objects. It also only monitors enumerable properties and like the MaxArt2501 implementation several hundred lines of code.
 
