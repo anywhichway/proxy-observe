@@ -26,6 +26,12 @@
 	    	deliver();
 	    	return proxy;
 	    }
+	    Observer.prototype.get = function(target, property) {
+	    	if(property==="__observer__") {
+	    		return this;
+	    	}
+	    	return target[property];
+	    }
 	    Observer.prototype.set = function(target, property, value, receiver) {
 	    	var oldvalue = target[property];
 	    	var type = (oldvalue===undefined ? "add" : "update");
@@ -38,7 +44,7 @@
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
-	    }
+	    };
 	    Observer.prototype.deleteProperty = function(target, property) {
 	    	var oldvalue = target[property];
 	    	delete target[property];
@@ -47,7 +53,7 @@
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
-	    }
+	    };
 	    Observer.prototype.defineProperty = function(target, property, descriptor) {
 	   		Object.defineProperty(target, property, descriptor);
 	    	if(!this.acceptlist || this.acceptlist.indexOf("reconfigure")>=0) {
@@ -55,7 +61,7 @@
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
-	    }
+	    };
 	    Observer.prototype.setProtoypeOf = function(target, prototype) {
 	    	var oldvalue = Object.getPrototypeOf(target);
 	        Object.setPrototypeOf(target, prototype);
@@ -64,10 +70,19 @@
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
-	    }
+	    };
+	    Observer.prototype.preventExtensions = function(target) {
+	    	var oldvalue = Object.getPrototypeOf(target);
+	        Object.preventExtensions(target);
+	    	if(!this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
+	        	var change = {object:this.proxy,type:"preventExtensions"};
+	        	this.changeset.push(change);
+	    	}
+	    	return true;
+	    };
 	    Object.observe = function(object,callback,acceptlist) {
 	    	return new Observer(object,callback,acceptlist);
-	    }
+	    };
 	    Object.unobserve = function(object,callback) {
 	    	if(object.__observerCallbacks__) {
 	    		object.__observerCallbacks__.forEach(function(observercallback,i) {
@@ -76,8 +91,64 @@
 	    				delete object.__observers__[i].callback;
 	    				object.__observers__.splice(i,1);
 	    			}
-	    		})
+	    		});
 	    	}
-	    }
+	    };
+	    Array.observe = function(object,callback,acceptlist) {
+	    	var proxy = Object.observe(object,function(changeset) { 
+	    		var changes = [];
+	    		changeset.forEach(function(change) {
+	    			if(change.name!=="length" && change.name!=="add") {
+	    				changes.push(change);
+	    			}
+	    		});
+	    		if(changes.length>0) {
+	    			callback(changes);
+	    		}
+	    	},acceptlist);
+	    	var oldsplice = object.splice;
+	    	object.splice = function(start,end) {
+	    		var removed = this.slice(start,end);
+	    		var addedCount = arguments.length - 1;
+	    		var change =  {object:proxy,type:"splice",index:start,removed:removed,addedCount:addedCount};
+	    		oldsplice.apply(this,arguments);
+	    		proxy.__observer__.changeset.push(change);
+	    	};
+	    	var oldpush = object.push;
+	    	object.push = function(item) {
+	    		return this.splice(this.length-1,0,item);
+	    	};
+	    	var oldpop = object.pop;
+	    	object.pop = function(item) {
+	    		return this.splice(this.length-1,1);
+	    	};
+	    	var oldunshift = object.unshift;
+	    	object.unshift = function(item) {
+	    		return this.splice(0,0,item);
+	    	};
+	    	var shift = object.shift;
+	    	object.shift = function(item) {
+	    		return this.splice(0,1);
+	    	};
+	    	return proxy;
+	    };
 	}
+	Object.deepObserve = function(object,callback,parts) {
+		parts = (parts ? parts : []);
+		var keys = Object.keys(object);
+		Object.observe(object,function(changeset) {
+			var changes = [];
+			changeset.forEach(function(change) {
+				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:(parts.length>0 ? parts.join(".") + "." : "") + change.name});
+			});
+			callback(changes);
+		});
+		keys.forEach(function(key) {
+			if(object[key] instanceof Object) {
+				var newparts = parts.slice(0);
+				newparts.push(key);
+				Object.deepObserve(object[key],callback,newparts);
+			}
+		});
+	};
 })();
