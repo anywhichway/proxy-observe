@@ -20,6 +20,7 @@ There is a slightly more complete EcmaScript implementation available at https:/
 The above being said, we had an application that could not afford to miss events or have them out of order and we also wanted something lighter and potentially faster. Hence, we built a Proxy based polyfill. Although it is not yet as broadly used and others have not yet had the time to provide feedback; as far as we know the sole shortcomings of our implementation are:
 
 1) There are some less used functions not yet implemented, e.g. deliverChangeRecords.
+
 2) The variables pointing to objects that are being observed must be re-assigned to point to a proxy returned by the call to Object.observe, e.g.
 
 var object = { foo: null };
