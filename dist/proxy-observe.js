@@ -136,7 +136,7 @@
 	Object.deepObserve = function(object,callback,parts) {
 		parts = (parts ? parts : []);
 		var keys = Object.keys(object);
-		Object.observe(object,function(changeset) {
+		object = Object.observe(object,function(changeset) {
 			var changes = [];
 			changeset.forEach(function(change) {
 				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:(parts.length>0 ? parts.join(".") + "." : "") + change.name});
@@ -150,5 +150,6 @@
 				Object.deepObserve(object[key],callback,newparts);
 			}
 		});
+		return object;
 	};
 })();

@@ -48,6 +48,8 @@ Currently Object.deepObserve does not support event type selectivity. All events
 
 # Release History
 
+v0.0.4 2015-10-03 Fixed issue with deepObserve discovered during code walkthrough. Issue would have impacted non-Chrome browsers. Consider this a BETA.
+
 v0.0.3 2015-10-01 Updated README. No unit tests yet. Consider this a BETA.
 
 v0.0.2 2015-10-01 Added Object.deepObserve and Array.observe. No unit tests yet. Consider this a BETA.
