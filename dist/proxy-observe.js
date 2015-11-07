@@ -1,5 +1,5 @@
 (function() {
-	if(!Object.observe && Proxy) {
+	if(!Object.observe && typeof(Proxy)==="object") {
 	    function Observer(target,callback,acceptlist) {
 	    	var me = this;
 	    	function deliver() {
@@ -138,8 +138,32 @@
 		var keys = Object.keys(object);
 		object = Object.observe(object,function(changeset) {
 			var changes = [];
+			function recurse(name,rootObject,oldObject,newObject,path) {
+				if(newObject instanceof Object) {
+					var newkeys = Object.keys(newObject);
+					newkeys.forEach(function(key) {
+						if(!oldObject || (oldObject[key]!==newObject[key])) {
+							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined);
+							var change = (oldvalue===undefined ? "add" : "update");
+							var keypath = path + "." + key;
+							changes.push({name:name,object:rootObject,type:change,oldValue:oldvalue,newValue:newObject[key],keypath:keypath});
+							recurse(name,rootObject,oldvalue,newObject[key],keypath);
+						}
+					});
+				} else if(oldObject instanceof Object) {
+					var oldkeys = Object.keys(oldObject);
+					oldkeys.forEach(function(key) {
+						var change = (newObject===null ? "update" : "delete");
+						var keypath = path + "." + key;
+						changes.push({name:name,object:rootObject,type:change,oldValue:oldObject[key],newValue:newObject,keypath:keypath});
+						recurse(name,rootObject,oldObject[key],undefined,keypath);
+					});
+				}
+			}
 			changeset.forEach(function(change) {
-				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:(parts.length>0 ? parts.join(".") + "." : "") + change.name});
+				var keypath = (parts.length>0 ? parts.join(".") + "." : "") + change.name;
+				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:keypath});
+				recurse(change.name,change.object,change.oldValue,change.object[change.name],keypath);
 			});
 			callback(changes);
 		});

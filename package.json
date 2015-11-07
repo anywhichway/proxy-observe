@@ -1,6 +1,6 @@
 {
   "name": "proxy-observe",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "private": false,
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",
   "main": "dist/proxy-observe.js",
