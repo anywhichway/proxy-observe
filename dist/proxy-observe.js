@@ -1,5 +1,5 @@
 (function() {
-	if(!Object.observe && typeof(Proxy)==="object") {
+	if(!Object.observe && typeof(Proxy)==="function") {
 	    function Observer(target,callback,acceptlist) {
 	    	var me = this;
 	    	function deliver() {

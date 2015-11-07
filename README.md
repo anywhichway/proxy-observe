@@ -51,6 +51,8 @@ Currently Object.deepObserve does not support event type selectivity. All events
 
 # Release History
 
+v0.0.6 2015-11-07 Fixed another issue with testing for existence of Proxy object. Consider this a BETA.
+
 v0.0.5 2015-11-07 Fixed issue with testing for existence of Proxy object. Consider this a BETA.
 
 v0.0.4 2015-10-03 Fixed issue with deepObserve discovered during code walkthrough. Issue would have impacted non-Chrome browsers. Consider this a BETA.
