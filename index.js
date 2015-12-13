@@ -33,7 +33,7 @@
 	    	}
 	    	return target[property];
 	    }
-	    Observer.prototype.set = function(target, property, value, receiver) {
+	    Observer.prototype.set = function(target, property, value) { // , receiver
 	    	var oldvalue = target[property];
 	    	var type = (oldvalue===undefined ? "add" : "update");
 	    	target[property] = value;
@@ -73,7 +73,7 @@
 	    	return true;
 	    };
 	    Observer.prototype.preventExtensions = function(target) {
-	    	var oldvalue = Object.getPrototypeOf(target);
+	    	//var oldvalue = Object.getPrototypeOf(target);
 	        Object.preventExtensions(target);
 	    	if(!this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
 	        	var change = {object:this.proxy,type:"preventExtensions"};
@@ -115,20 +115,20 @@
 	    		oldsplice.apply(this,arguments);
 	    		proxy.__observer__.changeset.push(change);
 	    	};
-	    	var oldpush = object.push;
+	    	//var oldpush = object.push;
 	    	object.push = function(item) {
 	    		return this.splice(this.length-1,0,item);
 	    	};
-	    	var oldpop = object.pop;
-	    	object.pop = function(item) {
+	    	//var oldpop = object.pop;
+	    	object.pop = function() {
 	    		return this.splice(this.length-1,1);
 	    	};
-	    	var oldunshift = object.unshift;
+	    	//var oldunshift = object.unshift;
 	    	object.unshift = function(item) {
 	    		return this.splice(0,0,item);
 	    	};
-	    	var shift = object.shift;
-	    	object.shift = function(item) {
+	    	//var oldshift = object.shift;
+	    	object.shift = function() {
 	    		return this.splice(0,1);
 	    	};
 	    	return proxy;

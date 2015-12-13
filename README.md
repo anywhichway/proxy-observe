@@ -11,7 +11,9 @@ Object.deepObserve goes beyond the EcmaScript spec and implements the ability to
 
 npm install proxy-observe
 
-Or, copy the contents of dist/proxy-observe.js to your local machine and include it like you would any Javascript file. Except for Chrome, which has native support for Object.observe and does not need to use Proxy, you will need to get a shim for Proxy if your browser does not support it.
+Except for Chrome, which has native support for Object.observe and for which this package provides very little functionality you will need to get a shim for Proxy if your browser does not support it.
+
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/708886d433ad4de589c516fa8fed73e9)](https://www.codacy.com/app/syblackwell/proxy-observe)
 
 # Philosophy
 
@@ -50,6 +52,8 @@ Object.getNotifier and Object.deliverChangeRecords are not implemented.
 Currently Object.deepObserve does not support event type selectivity. All events are monitored. There is also no Object.deepUnobserve.
 
 # Release History
+
+v0.0.8 2015-12-13 Codacy driven enhancements. Consider this a BETA.
 
 v0.0.6 2015-11-07 Fixed another issue with testing for existence of Proxy object. Consider this a BETA.
 
