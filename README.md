@@ -7,13 +7,17 @@ Array.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec
 
 Object.deepObserve goes beyond the EcmaScript spec and implements the ability to observe an object and all its sub-objects with a single call.
 
+[![Codacy Badge](https://api.codacy.com/project/badge/grade/708886d433ad4de589c516fa8fed73e9)](https://www.codacy.com/app/syblackwell/proxy-observe)
+
 # Installation
 
 npm install proxy-observe
 
-Except for Chrome, which has native support for Object.observe and for which this package provides very little functionality you will need to get a shim for Proxy if your browser does not support it.
+For browser usage you can include the index.js file from the proxy-observe directory in your build process or put it in a location where you can load it directly to the browser.
 
-[![Codacy Badge](https://api.codacy.com/project/badge/grade/708886d433ad4de589c516fa8fed73e9)](https://www.codacy.com/app/syblackwell/proxy-observe)
+At this time, except for Chrome, which has native support for Object.observe and for which this package provides very little additional functionality you will need to get a shim for Proxy if your browser does not support it.
+
+At some point in 2016 it is likely Object.observe with disappear from Chrome and Proxy will appear. At that point this library can be used to replace what will then be missing functionality in Chrome.
 
 # Philosophy
 
@@ -33,7 +37,7 @@ object.foo = "bar";
 
 will result in {foo: "bar"} being printed to the console
 
-Item one above can be re-mediated over time (Hopefully the browser vendors will finish implementing the spec and we won't have to do this re-mediation). 
+Item one above can be re-mediated over time.
 
 We believe item three is a small price to pay. Our implementation is also less than 175 lines of code and 3K including Array.observe and Object.deepObserve vs. over 500 lines of code and 28K for MaxArt2501 covering just Object.observe.
 
@@ -41,17 +45,23 @@ There is an additional implementation at https://github.com/joelgriffith/object-
 
 Anyway, now you have a choice MaxArt2501, Joel Griffith or AnyWhichWay, and choice is good! They all have their pros and cons.
 
-# What's Implemented and Not
+# What's Implemented and Not and Other Issues
+
+Array.observe does not behave well in Chrome. It is the native implementation that does not behave well. We are looking to patch this in the future. Unit tests pass in Firefox, which uses our observe implementation.
 
 You can observe for ["add", "update", "delete", "reconfigure", "setPrototype","preventExtensions"] using Object.observe.
 
 You can observe for ["add", "update", "delete", "splice"] using Array.observe.
+
+Array.unobserve is not yet implemented.
 
 Object.getNotifier and Object.deliverChangeRecords are not implemented.
 
 Currently Object.deepObserve does not support event type selectivity. All events are monitored. There is also no Object.deepUnobserve.
 
 # Release History
+
+v0.0.9 2015-12-13 Added some unit tests and updated documentation. Consider this a BETA.
 
 v0.0.8 2015-12-13 Codacy driven enhancements. Consider this a BETA.
 
@@ -66,7 +76,6 @@ v0.0.3 2015-10-01 Updated README. No unit tests yet. Consider this a BETA.
 v0.0.2 2015-10-01 Added Object.deepObserve and Array.observe. No unit tests yet. Consider this a BETA.
 
 v0.0.1 2015-10-01 Initial release. No unit tests yet. Consider this a BETA.
-
 
 
 # License

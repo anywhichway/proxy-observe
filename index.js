@@ -1,20 +1,22 @@
+//     proxy-observe
+//
+//     Copyright (c) 2015 Simon Y. Blackwell, AnyWhichWay
+//     MIT License - http://opensource.org/licenses/mit-license.php
 (function() {
 	"use strict";
-	if(!Object.observe && typeof(Proxy)==="function") {
-	    function Observer(target,callback,acceptlist) {
+	 function Observer(target,callback,acceptlist) {
 	    	var me = this;
 	    	function deliver() {
-	    		if(me.callback) {
-	        		if(me.changeset.length>0) {
-	        			me.callback(me.changeset);
-	        			me.changeset = [];
-	        		}
-	        		setTimeout(deliver,0);
-	    		}
+        		if(me.changeset.length>0) {
+    	    		var changes = me.changeset.filter(function(change) { return !acceptlist || acceptlist.indexOf(change.type)>=0; });
+        			if(changes.length>0) {
+        				callback(changes);
+        			}
+        			me.changeset = [];
+        		}
+        		setTimeout(deliver,0);
 	    	}
 	    	me.target = target;
-	    	me.callback = callback;
-	    	me.acceptlist = acceptlist;
 	    	me.changeset = [];
 	    	if(!target.__observerCallbacks__) {
 	    		Object.defineProperty(target,"__observerCallbacks__",{enumerable:false,configurable:true,writable:false,value:[]});
@@ -23,10 +25,10 @@
 	    	target.__observerCallbacks__.push(callback);
 	    	target.__observers__.push(this);
 	    	var proxy = new Proxy(target,me);
-	    	me.proxy = proxy;
 	    	deliver();
 	    	return proxy;
 	    }
+	if(!Object.observe && typeof(Proxy)==="function") {
 	    Observer.prototype.get = function(target, property) {
 	    	if(property==="__observer__") {
 	    		return this;
@@ -97,42 +99,47 @@
 	    };
 	    Array.observe = function(object,callback,acceptlist) {
 	    	var proxy = Object.observe(object,function(changeset) { 
-	    		var changes = [];
-	    		changeset.forEach(function(change) {
-	    			if(change.name!=="length" && change.name!=="add") {
-	    				changes.push(change);
-	    			}
-	    		});
+	    		var changes = changeset.filter(function(change) { return change.name!=="length" && change.name!=="add" && (!acceptlist || acceptlist.indexOf(change.type)>=0); });
 	    		if(changes.length>0) {
 	    			callback(changes);
 	    		}
 	    	},acceptlist);
 	    	var oldsplice = object.splice;
-	    	object.splice = function(start,end) {
+	    	proxy.splice = function(start,end) {
 	    		var removed = this.slice(start,end);
 	    		var addedCount = arguments.length - 1;
 	    		var change =  {object:proxy,type:"splice",index:start,removed:removed,addedCount:addedCount};
 	    		oldsplice.apply(this,arguments);
-	    		proxy.__observer__.changeset.push(change);
+	    		if(acceptlist.indexOf("splice")>=0) {
+	    			proxy.__observer__.changeset.push(change);
+	    		}
 	    	};
-	    	//var oldpush = object.push;
-	    	object.push = function(item) {
+	    	object.splice.oldsplice = oldsplice;
+	    	var oldpush = object.push;
+	    	proxy.push = function(item) {
 	    		return this.splice(this.length-1,0,item);
 	    	};
-	    	//var oldpop = object.pop;
-	    	object.pop = function() {
+	    	object.push.oldpush = oldpush;
+	    	var oldpop = object.pop;
+	    	proxy.pop = function() {
 	    		return this.splice(this.length-1,1);
 	    	};
-	    	//var oldunshift = object.unshift;
-	    	object.unshift = function(item) {
+	    	object.pop.oldpop = oldpop;
+	    	var oldunshift = object.unshift;
+	    	proxy.unshift = function(item) {
 	    		return this.splice(0,0,item);
 	    	};
-	    	//var oldshift = object.shift;
-	    	object.shift = function() {
+	    	object.unshift.oldunshift = oldunshift;
+	    	var oldshift = object.shift;
+	    	proxy.shift = function() {
 	    		return this.splice(0,1);
 	    	};
+	    	object.shift.oldshift = oldshift;
 	    	return proxy;
 	    };
+	   //Array.unobserve(object,callback) {
+		//   
+	  // }
 	}
 	Object.deepObserve = function(object,callback,parts) {
 		parts = (parts ? parts : []);

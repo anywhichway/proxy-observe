@@ -1,12 +1,12 @@
 {
   "name": "proxy-observe",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "private": false,
   "isomorphic": true,
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+     "test": "istanbul cover node_modules/mocha/bin/_mocha"
   },
   "repository": {
     "type": "git",
@@ -20,8 +20,11 @@
   "bugs": {
     "url": "https://github.com/anywhichway/proxy-observe/issues"
   },
-  "dependencies": {
-   
-  },
-  "homepage": "https://github.com/anywhichway/proxy-observe"
+  "dependencies": {},
+  "homepage": "https://github.com/anywhichway/proxy-observe",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4"
+  }
 }
