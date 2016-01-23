@@ -4,6 +4,10 @@
 //     MIT License - http://opensource.org/licenses/mit-license.php
 (function() {
 	"use strict";
+	// Creates and returns a Proxy wrapping a target so that all changes can be trapped and forwarded to
+	// a callback. The callback takes an array of changes just like the traditional original Chrome Object.observe
+	// {object:<object changed>,name:<field changed>,type:add|update|delete|reconfigure|preventExtensions|setPrototype,oldValue:<old value if update | delete>}
+	// The acceptlist can be add|update|delete|reconfigure|preventExtensions|setPrototype.
 	 function Observer(target,callback,acceptlist) {
 	    	var me = this;
 	    	function deliver() {

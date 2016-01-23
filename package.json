@@ -6,7 +6,7 @@
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",
   "main": "index.js",
   "scripts": {
-     "test": "istanbul cover node_modules/mocha/bin/_mocha"
+    "test": "istanbul cover node_modules/mocha/bin/_mocha"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/anywhichway/proxy-observe",
   "devDependencies": {
     "chai": "^3.4.1",
+    "codeclimate-test-reporter": "^0.3.0",
     "istanbul": "^0.4.1",
     "mocha": "^2.3.4"
   }
