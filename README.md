@@ -8,6 +8,11 @@ Array.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec
 Object.deepObserve goes beyond the EcmaScript spec and implements the ability to observe an object and all its sub-objects with a single call.
 
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/708886d433ad4de589c516fa8fed73e9)](https://www.codacy.com/app/syblackwell/proxy-observe)
+[![Code Climate](https://codeclimate.com/github/anywhichway/proxy-observe/badges/gpa.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
+[![Issue Count](https://codeclimate.com/github/anywhichway/proxy-observe/badges/issue_count.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
+
+[![NPM](https://nodei.co/npm/proxy-observe.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/<proxy-observe>/)
+
 
 # Installation
 
