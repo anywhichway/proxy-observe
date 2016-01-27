@@ -18,7 +18,7 @@ Object.deepObserve goes beyond the EcmaScript spec and implements the ability to
 
 npm install proxy-observe
 
-For browser usage you can include the index.js file from the proxy-observe directory in your build process or put it in a location where you can load it directly to the browser.
+The index.js and package.json files are compatible with https://github.com/anywhichway/node-require so that stringformatter can be served directly to the browser from the node-modules/stringformatter directory when using node Express. You can also use the files in the browser subdirectory directly.
 
 At this time, except for Chrome, which has native support for Object.observe and for which this package provides very little additional functionality you will need to get a shim for Proxy if your browser does not support it.
 
@@ -65,6 +65,8 @@ Object.getNotifier and Object.deliverChangeRecords are not implemented.
 Currently Object.deepObserve does not support event type selectivity. All events are monitored. There is also no Object.deepUnobserve.
 
 # Release History
+
+v0.0.10 2016-01-26 Added browserified versions. Re-wrote unit tests to use blanket.js since unit tests will always pass on Chrome since it has native support for Object.observe and unit testing must be done in the browser until node.js support MS Chakra. However, the test coverage reporting is not working.
 
 v0.0.9 2015-12-13 Added some unit tests and updated documentation. Consider this a BETA.
 
