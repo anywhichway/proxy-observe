@@ -1,6 +1,6 @@
 //     proxy-observe
 //
-//     Copyright (c) 2015 Simon Y. Blackwell, AnyWhichWay
+//     Copyright (c) 2015, 2016 Simon Y. Blackwell, AnyWhichWay
 //     MIT License - http://opensource.org/licenses/mit-license.php
 (function() {
 	"use strict";
@@ -8,18 +8,39 @@
 	// a callback. The callback takes an array of changes just like the traditional original Chrome Object.observe
 	// {object:<object changed>,name:<field changed>,type:add|update|delete|reconfigure|preventExtensions|setPrototype,oldValue:<old value if update | delete>}
 	// The acceptlist can be add|update|delete|reconfigure|preventExtensions|setPrototype.
-	 function Observer(target,callback,acceptlist) {
-	    	var me = this;
-	    	function deliver() {
-        		if(me.changeset.length>0) {
-    	    		var changes = me.changeset.filter(function(change) { return !acceptlist || acceptlist.indexOf(change.type)>=0; });
-        			if(changes.length>0) {
-        				callback(changes);
-        			}
-        			me.changeset = [];
-        		}
-        		setTimeout(deliver,0);
+	// v 0.0.10 to support pausing and restarting observation two additional constructor arguments are available to Object.observe:
+	// pausable - create the Observer so it can be paused
+	// pause - create observer in paused state
+	// if pausable is true then an additional method deliver(ignorePrevious) is available to start delivery
+	// to pause delivery set a property called pause on the function deliver to true
+	// pausable is optional to reduce the chance of shadowing a property or method on any existing code called deliver
+	if(!Object.observe && typeof(Proxy)==="function") {
+		function Observer(target,callback,acceptlist,pausable,pause) {
+	    	var me = this, proxy;
+	    	function deliver(ignorePrevious) {
+	    		if(!deliver.pause) {
+	        		if(me.changeset.length>0) {
+	        			if(!ignorePrevious) {
+		    	    		var changes = me.changeset.filter(function(change) { return !acceptlist || acceptlist.indexOf(change.type)>=0; });
+		        			if(changes.length>0) {
+		        				callback(changes);
+		        			}
+	        			}
+	        			me.changeset = [];
+	        		}
+	        		setTimeout(deliver,0);
+	    		}
 	    	}
+	    	deliver.pause = pause;
+		    me.get = function(target, property) {
+		    	if(property==="__observer__") {
+		    		return me;
+		    	}
+		    	if(pausable && property==="deliver") {
+		    		return deliver;
+		    	}
+		    	return target[property];
+		    }
 	    	me.target = target;
 	    	me.changeset = [];
 	    	if(!target.__observerCallbacks__) {
@@ -32,19 +53,12 @@
 	    	deliver();
 	    	return proxy;
 	    }
-	if(!Object.observe && typeof(Proxy)==="function") {
-	    Observer.prototype.get = function(target, property) {
-	    	if(property==="__observer__") {
-	    		return this;
-	    	}
-	    	return target[property];
-	    }
 	    Observer.prototype.set = function(target, property, value) { // , receiver
 	    	var oldvalue = target[property];
 	    	var type = (oldvalue===undefined ? "add" : "update");
 	    	target[property] = value;
 	    	if(!this.acceptlist || this.acceptlist.indexOf(type)>=0) {
-	        	var change = {object:this.proxy,name:property,type:type};
+	        	var change = {object:target,name:property,type:type};
 	        	if(type==="update") {
 	        		change.oldValue = oldvalue;
 	        	}
@@ -54,17 +68,19 @@
 	    };
 	    Observer.prototype.deleteProperty = function(target, property) {
 	    	var oldvalue = target[property];
-	    	delete target[property];
-	    	if(!this.acceptlist || this.acceptlist.indexOf("delete")>=0) {
-	        	var change = {object:this.proxy,name:property,type:"delete",oldValue:oldvalue};
-	        	this.changeset.push(change);
-	    	}
+	    	//if(typeof(oldvalue)!=="undefined") {
+		    	delete target[property];
+		    	if(!this.acceptlist || this.acceptlist.indexOf("delete")>=0) {
+		        	var change = {object:target,name:property,type:"delete",oldValue:oldvalue};
+		        	this.changeset.push(change);
+		    	}
+	    	//}
 	    	return true;
 	    };
 	    Observer.prototype.defineProperty = function(target, property, descriptor) {
 	   		Object.defineProperty(target, property, descriptor);
 	    	if(!this.acceptlist || this.acceptlist.indexOf("reconfigure")>=0) {
-	        	var change = {object:this.proxy,name:property,type:"reconfigure"};
+	        	var change = {object:target,name:property,type:"reconfigure"};
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
@@ -73,7 +89,7 @@
 	    	var oldvalue = Object.getPrototypeOf(target);
 	        Object.setPrototypeOf(target, prototype);
 	    	if(!this.acceptlist || this.acceptlist.indexOf("setProtoype")>=0) {
-	        	var change = {object:this.proxy,name:"__proto__",type:"setProtoype",oldValue:oldvalue};
+	        	var change = {object:target,name:"__proto__",type:"setProtoype",oldValue:oldvalue};
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
@@ -82,13 +98,13 @@
 	    	//var oldvalue = Object.getPrototypeOf(target);
 	        Object.preventExtensions(target);
 	    	if(!this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
-	        	var change = {object:this.proxy,type:"preventExtensions"};
+	        	var change = {object:target,type:"preventExtensions"};
 	        	this.changeset.push(change);
 	    	}
 	    	return true;
 	    };
-	    Object.observe = function(object,callback,acceptlist) {
-	    	return new Observer(object,callback,acceptlist);
+	    Object.observe = function(object,callback,acceptlist,pausable,pause) {
+	    	return new Observer(object,callback,acceptlist,pausable,pause);
 	    };
 	    Object.unobserve = function(object,callback) {
 	    	if(object.__observerCallbacks__) {
@@ -112,7 +128,7 @@
 	    	proxy.splice = function(start,end) {
 	    		var removed = this.slice(start,end);
 	    		var addedCount = arguments.length - 1;
-	    		var change =  {object:proxy,type:"splice",index:start,removed:removed,addedCount:addedCount};
+	    		var change =  {object:object,type:"splice",index:start,removed:removed,addedCount:addedCount};
 	    		oldsplice.apply(this,arguments);
 	    		if(acceptlist.indexOf("splice")>=0) {
 	    			proxy.__observer__.changeset.push(change);
@@ -121,12 +137,12 @@
 	    	object.splice.oldsplice = oldsplice;
 	    	var oldpush = object.push;
 	    	proxy.push = function(item) {
-	    		return this.splice(this.length-1,0,item);
+	    		return this.splice(this.length,0,item);
 	    	};
 	    	object.push.oldpush = oldpush;
 	    	var oldpop = object.pop;
 	    	proxy.pop = function() {
-	    		return this.splice(this.length-1,1);
+	    		return this.splice(this.length,1);
 	    	};
 	    	object.pop.oldpop = oldpop;
 	    	var oldunshift = object.unshift;

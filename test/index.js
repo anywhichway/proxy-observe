@@ -1,4 +1,8 @@
-
+var expect;
+if(typeof(window)==="undefined") {
+	expect = require("chai").expect;
+	require("../index.js");
+}
 
 var to = {}, ta = [];
 describe('Object', function() {
@@ -30,12 +34,29 @@ describe('Object', function() {
 		to.newProperty = false;
 	});
 	it('should support response to delete ', function(done) {
+		var d = false;
+		function onDelete(changes) {
+			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
+			Object.unobserve(to,onDelete);
+			if(!d) {
+				done();
+				d = true;
+			}
+		}
+		to = Object.observe(to,onDelete,["delete"]);
+		delete to.newProperty;
+	});
+	it('should support getting the deliver function on paused pausable observers add then start it ', function(done) {
 		function onDelete(changes) {
 			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
 			Object.unobserve(to,onDelete);
 			done();
 		}
-		to = Object.observe(to,onDelete,["delete"]);
+		to = Object.observe(to,onDelete,["delete"],true,true);
+		expect(typeof(to.deliver)).to.be.equal("function");
+		expect(to.deliver.pause).to.be.true;
+		to.deliver.pause = false;
+		to.deliver();
 		delete to.newProperty;
 	});
 });
@@ -44,6 +65,7 @@ describe('Array', function() {
 		expect(Array.observe).to.a('function');
 	});
 	it('should support response to add ', function(done) {
+
 		function onAdd(changes) {
 			expect(changes.every(function(change) { return change.type==="add"; })).to.be.true;
 			//Array.unobserve(ta,onAdd);
@@ -53,10 +75,14 @@ describe('Array', function() {
 		ta.newProperty = true;
 	});
 	it('should support response to update ', function(done) {
+		var d = false;
 		function onUpdate(changes) {
 			expect(changes.every(function(change) { return change.type==="update"; })).to.be.true;
 			//Array.unobserve(ta,onUpdate);
-			done();
+			if(!d) {
+				done();
+				d = true;
+			}
 		}
 		ta = Array.observe(ta,onUpdate,["update"]);
 		ta.newProperty = false;

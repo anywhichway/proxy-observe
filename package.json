@@ -1,6 +1,6 @@
 {
   "name": "proxy-observe",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "private": false,
   "isomorphic": true,
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",
@@ -30,7 +30,6 @@
     "chai": "^3.4.1",
     "codeclimate-test-reporter": "^0.3.0",
     "istanbul": "^0.4.1",
-    "mocha": "^2.3.4",
-    "qunitjs": "^1.20.0"
+    "mocha": "^2.3.4"
   }
 }
