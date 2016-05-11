@@ -1,6 +1,9 @@
+var expect;
+if(typeof(window)==="undefined") {
+	expect = require("chai").expect;
+	require("../index.js");
+}
 
-
-var to = {}, ta = [];
 describe('Object', function() {
 	it('should have an observe function ', function() {
 	  expect(Object.observe).to.be.a('function');
@@ -12,6 +15,7 @@ describe('Object', function() {
 	  expect(Object.deepObserve).to.be.a('function');
 	});
 	it('should support response to add ', function(done) {
+		var to = {};
 		function onAdd(changes) {
 			expect(changes.every(function(change) { return change.type==="add"; })).to.be.true;
 			Object.unobserve(to,onAdd);
@@ -21,6 +25,7 @@ describe('Object', function() {
 		to.newProperty = true;
 	});
 	it('should support response to update ', function(done) {
+		var to = {newProperty:true};
 		function onUpdate(changes) {
 			expect(changes.every(function(change) { return change.type==="update"; })).to.be.true;
 			Object.unobserve(to,onUpdate);
@@ -30,20 +35,117 @@ describe('Object', function() {
 		to.newProperty = false;
 	});
 	it('should support response to delete ', function(done) {
+		var to = {};
+		var d = false;
+		function onDelete(changes) {
+			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
+			Object.unobserve(to,onDelete);
+			if(!d) {
+				done();
+				d = true;
+			}
+		}
+		to = Object.observe(to,onDelete,["delete"]);
+		delete to.newProperty;
+	});
+	it('should support getting the deliver function on paused pausable observers add then start it ', function(done) {
+		var to = {};
 		function onDelete(changes) {
 			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
 			Object.unobserve(to,onDelete);
 			done();
 		}
-		to = Object.observe(to,onDelete,["delete"]);
+		to = Object.observe(to,onDelete,["delete"],true,true);
+		expect(typeof(to.deliver)).to.be.equal("function");
+		expect(to.deliver.pause).to.be.true;
+		to.deliver.pause = false;
+		to.deliver();
 		delete to.newProperty;
+	});
+	it('should support reconfigure ', function(done) {
+		var to = {newProperty:0};
+		var d = false;
+		function onReconfigure(changes) {
+			expect(changes.every(function(change) { return change.type==="reconfigure"; })).to.be.true;
+			Object.unobserve(to,onReconfigure);
+			done();
+		}
+		to = Object.observe(to,onReconfigure,["reconfigure"]);
+		Object.defineProperty(to,"newProperty",{value:1});
+	});
+	it('should support setPrototypeOf ', function(done) {
+		var to = {newProperty:0};
+		var d = false;
+		function onSetPrototype(changes) {
+			expect(changes.every(function(change) { return change.type==="setPrototype"; })).to.be.true;
+			Object.unobserve(to,onSetPrototype);
+			done();
+		}
+		to = Object.observe(to,onSetPrototype,["setPrototype"]);
+		Object.setPrototypeOf(to,function() {});
+	});
+	it('should support preventExtensions ', function(done) {
+		var to = {newProperty:0};
+		var d = false;
+		function onPreventExtensions(changes) {
+			expect(changes.every(function(change) { return change.type==="preventExtensions"; })).to.be.true;
+			Object.unobserve(to,onPreventExtensions);
+			done();
+		}
+		to = Object.observe(to,onPreventExtensions,["preventExtensions"]);
+		Object.preventExtensions(to);
+	});
+	it('should support deepObserve add ', function(done) {
+		var to = {subobject:{subsubobject:{}}};
+		function onAdd(changes) {
+			expect(changes.every(function(change) { return change.type==="add"; })).to.be.true;
+			Object.unobserve(to,onAdd);
+			done();
+		}
+		to = Object.deepObserve(to,onAdd);
+		var so = to.subobject;
+		so.subsubobject.newProperty = true;
+	});
+	it('should support deepObserve update ', function(done) {
+		var to = {subobject:{newProperty:true}};
+		function onUpdate(changes) {
+			expect(changes.every(function(change) { return change.type==="update"; })).to.be.true;
+			Object.unobserve(to,onUpdate);
+			done();
+		}
+		to = Object.deepObserve(to,onUpdate);
+		to.subobject.newProperty = false;
+	});
+	it('should support deepObserve delete ', function(done) {
+		var to = {subobject:{newProperty:true}};
+		var d = false;
+		function onDelete(changes) {
+			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
+			Object.unobserve(to,onDelete);
+			if(!d) {
+				done();
+				d = true;
+			}
+		}
+		to = Object.deepObserve(to,onDelete);
+		delete to.subobject.newProperty;
 	});
 });
 describe('Array', function() {
 	it('should have an observe function', function() {
 		expect(Array.observe).to.a('function');
 	});
+	it('should throw TypeError on non-Array arg', function() {
+		var result;
+		try {
+			Array.observe();
+		} catch(e) {
+			result = e;
+		}
+		expect(result).to.be.instanceof(TypeError);
+	});
 	it('should support response to add ', function(done) {
+		var ta = [];
 		function onAdd(changes) {
 			expect(changes.every(function(change) { return change.type==="add"; })).to.be.true;
 			//Array.unobserve(ta,onAdd);
@@ -53,17 +155,24 @@ describe('Array', function() {
 		ta.newProperty = true;
 	});
 	it('should support response to update ', function(done) {
+		var ta = [];
+		ta.newProperty = true;
+		var d = false;
 		function onUpdate(changes) {
-			expect(changes.every(function(change) { return change.type==="update"; })).to.be.true;
+			expect(changes.some(function(change) { return change.type==="update" && change.name==="newProperty" && change.object.newProperty===false; })).to.be.true;
 			//Array.unobserve(ta,onUpdate);
-			done();
+			if(!d) {
+				done();
+				d = true;
+			}
 		}
 		ta = Array.observe(ta,onUpdate,["update"]);
 		ta.newProperty = false;
 	});
 	it('should support response to delete ', function(done) {
+		var ta = [];
 		function onDelete(changes) {
-			expect(changes.every(function(change) { return change.type==="delete"; })).to.be.true;
+			expect(changes.some(function(change) { return change.type==="delete";  })).to.be.true;
 			//Array.unobserve(ta,onDelete);
 			done();
 		}
@@ -71,13 +180,69 @@ describe('Array', function() {
 		delete ta.newProperty;
 	});
 	it('should support response to splice ', function(done) {
+		var ta = [-1,-2];
 		function onSplice(changes) {
-			var result = changes.every(function(change) { return change.type==="splice"; });
-			expect(changes.every(function(change) { return change.type==="splice"; })).to.be.true;
+			expect(changes.some(function(change) { return change.type==="splice" && change.index===1 && change.removed.length===1 && change.addedCount===2; })).to.be.true;
 			//Array.unobserve(ta,onSplice);
 			done();
 		}
 		ta = Array.observe(ta,onSplice,["splice"]);
-		ta.splice(0,[1,2]);
+		ta.splice(1,1,1,2);
+	});
+	it('should throw TypeError on non-numbers for splice ', function(done) {
+		var result, ta = [-1,-2];
+		function onSplice(changes) {
+			expect(changes.some(function(change) { return change.type==="splice" && change.index===1 && change.removed.length===1 && change.addedCount===2; })).to.be.true;
+			//Array.unobserve(ta,onSplice);
+			done();
+		}
+		ta = Array.observe(ta,onSplice,["splice"]);
+		try {
+			ta.splice("a",1,1,2);
+		} catch(e) {
+			result = e;
+		}
+		expect(result).to.be.instanceof(TypeError);
+		done();
+	});
+	it('should support response to push ', function(done) {
+		var ta = [];
+		function onSplice(changes) {
+			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===1; })).to.be.true;
+			//Array.unobserve(ta,onSplice);
+			done();
+		}
+		ta = Array.observe(ta,onSplice,["splice"]);
+		ta.push(1);
+	});
+	it('should support response to pop ', function(done) {
+		var ta = [1,2];
+		function onSplice(changes) {
+			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===1; })).to.be.true;
+			//Array.unobserve(ta,onSplice);
+			done();
+		}
+		ta = Array.observe(ta,onSplice,["splice"]);
+		ta.pop();
+	});
+	it('should support response to shift ', function(done) {
+		var ta = [1,2];
+		function onSplice(changes) {
+			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===2; })).to.be.true;
+			//Array.unobserve(ta,onSplice);
+			done();
+		}
+		ta = Array.observe(ta,onSplice,["splice"]);
+		ta.shift();
+	});
+	it('should support response to unshift ', function(done) {
+		var ta = [];
+		function onSplice(changes) {
+			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===1 })).to.be.true;
+			//Array.unobserve(ta,onSplice);
+			done();
+		}
+		ta = Array.observe(ta,onSplice,["splice"]);
+		ta.unshift(1);
 	});
 });
