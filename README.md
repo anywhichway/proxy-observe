@@ -15,6 +15,7 @@ A Proxy Based Implementation Of Object.observe, Array.observe plus Object.deepOb
 Documentation on usage can be found here:
 
 [Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe)
+
 [Array.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
 
 
