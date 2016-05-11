@@ -22,8 +22,6 @@ npm install proxy-observe
 
 The index.js and package.json files are compatible with https://github.com/anywhichway/node-require so that proxy-observe can be served directly to the browser from the node-modules/proxy-observe directory when using node Express. You can also use the files in the browser subdirectory directly.
 
-At this time, except for Chrome, which has native support for Object.observe and for which this package provides very little additional functionality you will need to get a shim for Proxy if your browser does not support it.
-
 In late April 2016 Object.observe disappeared from Chrome and Proxy appeared. As a result, the focus on supporting this library will go up so that can be used to replace what is now missing functionality in Chrome as well as support observers in other browsers.
 
 # Philosophy
@@ -81,10 +79,11 @@ Object.getNotifier and Object.deliverChangeRecords are not implemented.
 
 Currently Object.deepObserve does not support event type selectivity. All events are monitored. There is also no Object.deepUnobserve.
 
+v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
 
-v0.0.12 2016-05-11 Addressed issue 5. Added unit tests. Coverage over 90%. Array.unobserve still not implemented.
+v0.0.12 2016-05-11 Addressed issue 5. Added unit tests. Coverage over 90%. Array.unobserve still not implemented. setPrototypeOf observing does not work in Firefox.
 
 v0.0.11 2016-05-06 Addressed issues 2,3,4 ... added some unit tests to address issue 4. Unsure how long issue 2 has been undiscovered. Issue 3 has been in all versions. Issue 4 is an enhancement. Started testing in NodeJS v6.0 now that Proxy is supported by NodeJS. Array.unobserve still not implemented.
 
