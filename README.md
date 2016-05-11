@@ -7,8 +7,10 @@ Array.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec
 
 Object.deepObserve goes beyond the EcmaScript spec and implements the ability to observe an object and all its sub-objects with a single call.
 
+[![Build Status](https://travis-ci.org/anywhichway/jovial.svg)](https://travis-ci.org/anywhichway/proxy-observe)
 [![Codacy Badge](https://api.codacy.com/project/badge/grade/708886d433ad4de589c516fa8fed73e9)](https://www.codacy.com/app/syblackwell/proxy-observe)
 [![Code Climate](https://codeclimate.com/github/anywhichway/proxy-observe/badges/gpa.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
+[![Test Coverage](https://codeclimate.com/github/anywhichway/jovial/badges/coverage.svg)](https://codeclimate.com/github/anywhichway/proxy-observe/coverage)
 [![Issue Count](https://codeclimate.com/github/anywhichway/proxy-observe/badges/issue_count.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
 
 [![NPM](https://nodei.co/npm/proxy-observe.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/<proxy-observe>/)
@@ -79,9 +81,10 @@ Object.getNotifier and Object.deliverChangeRecords are not implemented.
 
 Currently Object.deepObserve does not support event type selectivity. All events are monitored. There is also no Object.deepUnobserve.
 
-v0.0.11 Will pass in a Chrome web browser but fail in Node v6.0.
 
 # Release History
+
+v0.0.12 2016-05-11 Addressed issue 5. Added unit tests. Coverage over 90%. Array.unobserve still not implemented.
 
 v0.0.11 2016-05-06 Addressed issues 2,3,4 ... added some unit tests to address issue 4. Unsure how long issue 2 has been undiscovered. Issue 3 has been in all versions. Issue 4 is an enhancement. Started testing in NodeJS v6.0 now that Proxy is supported by NodeJS. Array.unobserve still not implemented.
 
