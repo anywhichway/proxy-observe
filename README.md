@@ -1,9 +1,4 @@
 # proxy-observe
-A Proxy Based Implementation Of Object.observe, Array.observe plus Object.deepObserve.
-
-Object.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec.
-
-Array.observe is Proxy based polyfill based on a subset of the EcmaScript 7 spec.
 
 Object.deepObserve goes beyond the EcmaScript spec and implements the ability to observe an object and all its sub-objects with a single call.
 
@@ -14,6 +9,13 @@ Object.deepObserve goes beyond the EcmaScript spec and implements the ability to
 [![Issue Count](https://codeclimate.com/github/anywhichway/proxy-observe/badges/issue_count.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
 
 [![NPM](https://nodei.co/npm/proxy-observe.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/<proxy-observe>/)
+
+A Proxy Based Implementation Of Object.observe, Array.observe plus Object.deepObserve. Object.observe and Array.observe have now been deprecated from Chrome and standards tracks, but some developers may still find them useful or require them for backward compatibility in Chrome applications.
+
+Documentation on usage can be found here:
+
+[Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe)
+[Array.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
 
 
 # Installation
