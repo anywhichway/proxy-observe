@@ -1,6 +1,6 @@
 {
   "name": "proxy-observe",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "private": false,
   "isomorphic": true,
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",

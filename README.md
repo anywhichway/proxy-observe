@@ -8,7 +8,7 @@ Object.deepObserve goes beyond the EcmaScript spec and implements the ability to
 [![Test Coverage](https://codeclimate.com/github/anywhichway/jovial/badges/coverage.svg)](https://codeclimate.com/github/anywhichway/proxy-observe/coverage)
 [![Issue Count](https://codeclimate.com/github/anywhichway/proxy-observe/badges/issue_count.svg)](https://codeclimate.com/github/anywhichway/proxy-observe)
 
-[![NPM](https://nodei.co/npm/proxy-observe.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/<proxy-observe>/)
+[![NPM](https://nodei.co/npm/proxy-observe.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/proxy-observe/)
 
 A Proxy Based Implementation Of Object.observe, Array.observe plus Object.deepObserve. Object.observe and Array.observe have now been deprecated from Chrome and standards tracks, but some developers may still find them useful or require them for backward compatibility in Chrome applications.
 
