@@ -86,6 +86,8 @@ v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
 
+v0.0.13,14 2016-05-12 README and code style improvements.
+
 v0.0.12 2016-05-11 Addressed issue 5. Added unit tests. Coverage over 90%. Array.unobserve still not implemented. setPrototypeOf observing does not work in Firefox.
 
 v0.0.11 2016-05-06 Addressed issues 2,3,4 ... added some unit tests to address issue 4. Unsure how long issue 2 has been undiscovered. Issue 3 has been in all versions. Issue 4 is an enhancement. Started testing in NodeJS v6.0 now that Proxy is supported by NodeJS. Array.unobserve still not implemented.

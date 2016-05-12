@@ -49,7 +49,7 @@
 	    	}
 	    	me.target.__observerCallbacks__.push(callback);
 	    	me.target.__observers__.push(this);
-	    	var proxy = new Proxy(target,me);
+	    	proxy = new Proxy(target,me);
 	    	deliver();
 	    	return proxy;
 	    }
@@ -123,7 +123,7 @@
 	    	}
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
 	    		if(property==="splice") {
-	    			return function(start,end,array) {
+	    			return function(start,end) {
 	    				if(typeof(start)!=="number" || typeof(end)!=="number") {
 	    					throw new TypeError("First two arguments to Array slice are not number, number");
 	    				}
