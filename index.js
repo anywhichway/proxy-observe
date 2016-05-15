@@ -36,6 +36,12 @@
 		    	if(property==="__observer__") {
 		    		return me;
 		    	}
+		    	if(property==="unobserve") {
+		    		return function() {
+		    			Object.unobserve(target);
+		    			return target;
+		    		};
+		    	}
 		    	if(pausable && property==="deliver") {
 		    		return deliver;
 		    	}
@@ -44,6 +50,7 @@
 	    	me.target = target;
 	    	me.changeset = [];
 	    	if(!me.target.__observerCallbacks__) {
+	    		// __observerCallbacks__ is used as an index to get at the proxy which is the observer, so we can unobserve
 	    		Object.defineProperty(target,"__observerCallbacks__",{enumerable:false,configurable:true,writable:false,value:[]});
 	    		Object.defineProperty(target,"__observers__",{enumerable:false,configurable:true,writable:false,value:[]});
 	    	}
@@ -57,7 +64,7 @@
 	    	var oldvalue = target[property];
 	    	var type = (oldvalue===undefined ? "add" : "update");
 	    	target[property] = value;
-	    	if(!this.acceptlist || this.acceptlist.indexOf(type)>=0) {
+	    	if(target.__observers__.indexOf(this)>=0 && (!this.acceptlist || this.acceptlist.indexOf(type)>=0)) {
 	        	var change = {object:target,name:property,type:type};
 	        	if(type==="update") {
 	        		change.oldValue = oldvalue;
@@ -70,7 +77,7 @@
 	    	var oldvalue = target[property];
 	    	//if(typeof(oldvalue)!=="undefined") {
 		    	delete target[property];
-		    	if(!this.acceptlist || this.acceptlist.indexOf("delete")>=0) {
+		    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("delete")>=0) {
 		        	var change = {object:target,name:property,type:"delete",oldValue:oldvalue};
 		        	this.changeset.push(change);
 		    	}
@@ -79,7 +86,7 @@
 	    };
 	    Observer.prototype.defineProperty = function(target, property, descriptor) {
 	    	Object.defineProperty(target, property, descriptor);
-	    	if(!this.acceptlist || this.acceptlist.indexOf("reconfigure")>=0) {
+	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("reconfigure")>=0) {
 	        	var change = {object:target,name:property,type:"reconfigure"};
 	        	this.changeset.push(change);
 	    	}
@@ -88,7 +95,7 @@
 	    Observer.prototype.setPrototypeOf = function(target, prototype) {
 	    	var oldvalue = Object.getPrototypeOf(target);
 	    	Object.setPrototypeOf(target, prototype);
-	    	if(!this.acceptlist || this.acceptlist.indexOf("setPrototype")>=0) {
+	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("setPrototype")>=0) {
 	        	var change = {object:target,name:"__proto__",type:"setPrototype",oldValue:oldvalue};
 	        	this.changeset.push(change);
 	    	}
@@ -96,7 +103,7 @@
 	    };
 	    Observer.prototype.preventExtensions = function(target) {
 	        Object.preventExtensions(target);
-	    	if(!this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
+	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
 	        	var change = {object:target,type:"preventExtensions"};
 	        	this.changeset.push(change);
 	    	}
@@ -107,6 +114,11 @@
 	    };
 	    Object.unobserve = function(object,callback) {
 	    	if(object.__observerCallbacks__) {
+	    		if(!callback) {
+	    			object.__observerCallbacks__.splice(0,object.__observerCallbacks__.length);
+	    			object.__observers__.splice(0,object.__observers__.length);
+	    			return;
+	    		}
 	    		object.__observerCallbacks__.forEach(function(observercallback,i) {
 	    			if(callback===observercallback) {
 	    				object.__observerCallbacks__.splice(i,1);
@@ -122,6 +134,14 @@
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
+	    		if(property==="unobserve") {
+		    		return function(callback) {
+		    			if(callback) {
+		    				return Object.unobserve(target,callback);
+		    			}
+		    			return target.unobserve();
+		    		};
+		    	}
 	    		if(property==="splice") {
 	    			return function(start,end) {
 	    				if(typeof(start)!=="number" || typeof(end)!=="number") {
@@ -166,9 +186,9 @@
 	    	},acceptlist,pausable,pause);
 	    	return proxy;
 	    };
-	   //Array.unobserve(object,callback) {
-		//   
-	  // }
+	    Array.unobserve = function(object,callback) {
+		  return object.unobserve(callback);
+	    }
 	}
 	Object.deepObserve = function(object,callback,parts) {
 		parts = (parts ? parts : []);

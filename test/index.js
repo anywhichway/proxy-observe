@@ -5,14 +5,38 @@ if(typeof(window)==="undefined") {
 }
 
 describe('Object', function() {
-	it('should have an observe function ', function() {
+	it('Object should have an observe function ', function() {
 	  expect(Object.observe).to.be.a('function');
 	});
-	it('should have an unobserve function ', function() {
+	it('Object should have an unobserve function ', function() {
 	  expect(Object.unobserve).to.be.a('function');
 	});
-	it('should have an deepObserve function ', function() {
+	it('Object should have an deepObserve function ', function() {
 	  expect(Object.deepObserve).to.be.a('function');
+	});
+	it('should not observe after Object.unobserve ', function(done) {
+		var to = {};
+		function onAdd(changes) {
+			expect(changes==undefined).to.be.true;
+		}
+		to = Object.observe(to,onAdd,["add"]);
+		Object.unobserve(to,onAdd);
+		to.newProperty = true;
+		setTimeout(function () { done(); },1000);
+	});
+	it('should not observe and should return original object on <instance>.unobserve ', function(done) {
+		var to = {};
+		function onAdd(changes) {
+			expect(changes==undefined).to.be.true;
+		}
+		var observed = Object.observe(to,onAdd,["add"]);
+		var original = observed.unobserve();
+		observed.newProperty = true;
+		setTimeout(function () {
+				expect(to===original).to.be.true;
+				done(); 
+			},
+			1000);
 	});
 	it('should support response to add ', function(done) {
 		var to = {};
@@ -143,6 +167,30 @@ describe('Array', function() {
 			result = e;
 		}
 		expect(result).to.be.instanceof(TypeError);
+	});
+	it('should not observe after Array.unobserve ', function(done) {
+		var ta = [];
+		function onAdd(changes) {
+			expect(changes==undefined).to.be.true;
+		}
+		ta = Array.observe(ta,onAdd,["add"]);
+		Array.unobserve(ta,onAdd);
+		ta.newProperty = true;
+		setTimeout(function () { done(); },1000);
+	});
+	it('should not observe and should return original object on <Array instance>.unobserve ', function(done) {
+		var ta = [];
+		function onAdd(changes) {
+			expect(changes==undefined).to.be.true;
+		}
+		var observed = Object.observe(ta,onAdd,["add"]);
+		var original = observed.unobserve();
+		observed.newProperty = true;
+		setTimeout(function () {
+				expect(ta===original).to.be.true;
+				done(); 
+			},
+			1000);
 	});
 	it('should support response to add ', function(done) {
 		var ta = [];
