@@ -28,7 +28,7 @@
 	        			}
 	        			me.changeset = [];
 	        		}
-	        		setTimeout(deliver,0);
+	        		setTimeout(deliver,10);
 	    		}
 	    	}
 	    	deliver.pause = pause;
