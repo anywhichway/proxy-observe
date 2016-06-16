@@ -86,6 +86,8 @@ v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
 
+v0.0.17 2016-06-15 Fixed [![Issue ](https://github.com/anywhichway/proxy-observe/issues/10#issue-159794843)] thanks to [![goodells](https://github.com/goodells). Updated unit test `should support response to pop` accordingly.
+
 v0.0.16 2016-06-02 Modified delivery timeout from 0ms to 10ms to reduce CPU loading.
 
 v0.0.15 2016-05-15 README updates. Unobserve added to Array corrected issue with Object.unobserve not working. Also made callback argument to unobserve optional, which eliminates all observations. Finally, added an unobserve method on on observed instances which returns the original object, i.e. de-proxies, Added more unit tests.

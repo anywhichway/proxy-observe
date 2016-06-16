@@ -266,7 +266,7 @@ describe('Array', function() {
 	it('should support response to pop ', function(done) {
 		var ta = [1,2];
 		function onSplice(changes) {
-			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===1; })).to.be.true;
+			expect(changes.some(function(change) { return change.type==="splice" && ta[0]===1 && ta[1]===undefined; })).to.be.true;
 			//Array.unobserve(ta,onSplice);
 			done();
 		}

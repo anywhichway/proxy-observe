@@ -164,7 +164,7 @@
 	    		}
 	    		if(property==="pop") {
 	    			 return function() {
-	    		    	return this.splice(this.length,1);
+	    		    	return this.splice(this.length-1,1);
 	    		    }
 	    		}
 	    		if(property==="unshift") {
