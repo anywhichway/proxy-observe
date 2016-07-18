@@ -42,7 +42,9 @@ The above being said, we had an application that could not afford to miss events
 
 ```javascript
 var object = { foo: null };
-object = Object.observe(object,function(changeset) { console.log(changeset));
+object = Object.observe(object, function(changeset) {
+    console.log(changeset)
+});
 object.foo = "bar";
 ```
 
