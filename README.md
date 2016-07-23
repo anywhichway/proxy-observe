@@ -12,13 +12,6 @@
 
 A Proxy Based Implementation Of ```Object.observe```, ```Array.observe``` plus ```Object.deepObserve```. ```Object.observe``` and ```Array.observe``` have now been deprecated from Chrome and standards tracks, but some developers may still find them useful or require them for backward compatibility in Chrome applications.
 
-Documentation on usage can be found here:
-
-[Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe)
-
-[Array.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/observe)
-
-Also see the Enhancements section below.
 
 # Installation
 
@@ -58,10 +51,13 @@ There is an additional implementation at [https://github.com/joelgriffith/object
 
 Anyway, now you have a choice MaxArt2501, Joel Griffith or AnyWhichWay, and choice is good! They all have their pros and cons.
 
-# Enhancements
+# Usage and Enhancements
+
+` Object.observe = function(object,[callback[,acceptlist[,pausable[,pause[,delay]]])`
 
 Proxy-observe makes the second arguments to ```Object.unobserve``` and  ```Array.unobserve``` optional so that an object can be completely un-observed in one call. Additionally, ```<instance>.unobserve``` returns the original observed object or array "deproxied".
 
+[Object.observe](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/observe)
 
 Proxy-observer supports a deepObserve capability on nested objects. It also allows the pausing and starting of observers using two additional optional arguments to ```Object.observe```.
 
@@ -89,6 +85,8 @@ Currently ```Object.deepObserve``` does not support event type selectivity. All 
 v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
+
+v0.0.18 2016-07-22 Ehanced to take a 6th argument, `delay`, to set delivery timeout on changes in milliseconds. Also reduced CPU load by making the delivery function "smart". Delivery no longer creates timeout calls if there is nothing to deliver. The next change to an object will restart the delivery function with the previous delay setting.
 
 v0.0.17 2016-06-15 Fixed [Issue 10](https://github.com/anywhichway/proxy-observe/issues/10#issue-159794843) thanks to [goodells](https://github.com/goodells). Updated unit test `should support response to pop` accordingly.
 

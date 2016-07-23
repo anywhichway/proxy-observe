@@ -1,5 +1,4 @@
-//     proxy-observe
-//
+//     proxy-observe v0.0.18
 //     Copyright (c) 2015, 2016 Simon Y. Blackwell, AnyWhichWay
 //     MIT License - http://opensource.org/licenses/mit-license.php
 (function() {
@@ -15,9 +14,10 @@
 	// to pause delivery set a property called pause on the function deliver to true
 	// pausable is optional to reduce the chance of shadowing a property or method on any existing code called deliver
 	if(!Object.observe && typeof(Proxy)==="function") {
-		function Observer(target,callback,acceptlist,pausable,pause) {
+		function Observer(target,callback,acceptlist,pausable,pause,delay) {
 	    	var me = this, proxy;
-	    	function deliver(ignorePrevious) {
+	    	function deliver(ignorePrevious,delay) {
+	    		deliver.delay = delay;
 	    		if(!deliver.pause) {
 	        		if(me.changeset.length>0) {
 	        			if(!ignorePrevious) {
@@ -28,10 +28,10 @@
 	        			}
 	        			me.changeset = [];
 	        		}
-	        		setTimeout(deliver,10);
 	    		}
 	    	}
 	    	deliver.pause = pause;
+	    	deliver.delay = delay;
 		    me.get = function(target, property) {
 		    	if(property==="__observer__") {
 		    		return me;
@@ -42,7 +42,7 @@
 		    			return target;
 		    		};
 		    	}
-		    	if(pausable && property==="deliver") {
+		    	if(property==="deliver") {
 		    		return deliver;
 		    	}
 		    	return target[property];
@@ -57,19 +57,27 @@
 	    	me.target.__observerCallbacks__.push(callback);
 	    	me.target.__observers__.push(this);
 	    	proxy = new Proxy(target,me);
-	    	deliver();
+	    	deliver(false,delay);
 	    	return proxy;
 	    }
+		Observer.prototype.deliver = function() {
+			return this.get(null,"deliver");
+		}
 	    Observer.prototype.set = function(target, property, value) { // , receiver
 	    	var oldvalue = target[property];
 	    	var type = (oldvalue===undefined ? "add" : "update");
 	    	target[property] = value;
 	    	if(target.__observers__.indexOf(this)>=0 && (!this.acceptlist || this.acceptlist.indexOf(type)>=0)) {
-	        	var change = {object:target,name:property,type:type};
+	        	var change = {object:target,name:property,type:type},
+	        		start = this.changeset.length === 0,
+	        		deliver = this.deliver();
 	        	if(type==="update") {
 	        		change.oldValue = oldvalue;
 	        	}
 	        	this.changeset.push(change);
+	        	if(start) {
+	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        	}
 	    	}
 	    	return true;
 	    };
@@ -78,8 +86,13 @@
 	    	//if(typeof(oldvalue)!=="undefined") {
 		    	delete target[property];
 		    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("delete")>=0) {
-		        	var change = {object:target,name:property,type:"delete",oldValue:oldvalue};
+		        	var change = {object:target,name:property,type:"delete",oldValue:oldvalue},
+		        		start = this.changeset.length === 0,
+		        		deliver = this.deliver();
 		        	this.changeset.push(change);
+		        	if(start) {
+		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+		        	}
 		    	}
 	    	//}
 	    	return true;
@@ -87,8 +100,13 @@
 	    Observer.prototype.defineProperty = function(target, property, descriptor) {
 	    	Object.defineProperty(target, property, descriptor);
 	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("reconfigure")>=0) {
-	        	var change = {object:target,name:property,type:"reconfigure"};
+	        	var change = {object:target,name:property,type:"reconfigure"},
+        			start = this.changeset.length === 0,
+        			deliver = this.deliver();
 	        	this.changeset.push(change);
+	        	if(start) {
+	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        	}
 	    	}
 	    	return true;
 	    };
@@ -96,21 +114,31 @@
 	    	var oldvalue = Object.getPrototypeOf(target);
 	    	Object.setPrototypeOf(target, prototype);
 	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("setPrototype")>=0) {
-	        	var change = {object:target,name:"__proto__",type:"setPrototype",oldValue:oldvalue};
+	        	var change = {object:target,name:"__proto__",type:"setPrototype",oldValue:oldvalue},
+    				start = this.changeset.length === 0,
+    				deliver = this.deliver();
 	        	this.changeset.push(change);
+	        	if(start) {
+	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        	}
 	    	}
 	    	return true;
 	    };
 	    Observer.prototype.preventExtensions = function(target) {
 	        Object.preventExtensions(target);
 	    	if(target.__observers__.indexOf(this)>=0 && !this.acceptlist || this.acceptlist.indexOf("preventExtensions")>=0) {
-	        	var change = {object:target,type:"preventExtensions"};
+	        	var change = {object:target,type:"preventExtensions"},
+					start = this.changeset.length === 0,
+					deliver = this.deliver();
 	        	this.changeset.push(change);
+	        	if(start) {
+	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        	}
 	    	}
 	    	return true;
 	    };
-	    Object.observe = function(object,callback,acceptlist,pausable,pause) {
-	    	return new Observer(object,callback,acceptlist,pausable,pause);
+	    Object.observe = function(object,callback,acceptlist,pausable,pause,delay) {
+	    	return new Observer(object,callback,acceptlist,pausable,pause,delay);
 	    };
 	    Object.unobserve = function(object,callback) {
 	    	if(object.__observerCallbacks__) {
@@ -128,8 +156,7 @@
 	    		});
 	    	}
 	    };
-	   
-	    Array.observe = function(object,callback,acceptlist,pausable,pause) {
+	    Array.observe = function(object,callback,acceptlist,pausable,pause,delay) {
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
@@ -145,14 +172,19 @@
 	    		if(property==="splice") {
 	    			return function(start,end) {
 	    				if(typeof(start)!=="number" || typeof(end)!=="number") {
-	    					throw new TypeError("First two arguments to Array slice are not number, number");
+	    					throw new TypeError("First two arguments to Array splice are not number, number");
 	    				}
-	    	    		var removed = this.slice(start,start+end);
-	    	    		var addedCount = (arguments.length > 1 ? arguments.length-2 : 0);
-	    	    		var change =  {object:object,type:"splice",index:start,removed:removed,addedCount:addedCount};
+	    	    		var removed = this.slice(start,start+end),
+	    	    			addedCount = (arguments.length > 1 ? arguments.length-2 : 0),
+	    	    			change =  {object:object,type:"splice",index:start,removed:removed,addedCount:addedCount};
 	    	    		target.splice.apply(target,arguments);
 	    	    		if(acceptlist.indexOf("splice")>=0) {
+	    	    			var start = proxy.__observer__.changeset.length === 0,
+	    	        			deliver = proxy.__observer__.deliver();
 	    	    			proxy.__observer__.changeset.push(change);
+	    	    			if(start) {
+	    		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	    		        	}
 	    	    		}
 	    	    	}
 	    		}
@@ -183,7 +215,7 @@
 	    		if(changes.length>0) {
 	    			callback(changes);
 	    		}
-	    	},acceptlist,pausable,pause);
+	    	},acceptlist,pausable,pause,delay);
 	    	return proxy;
 	    };
 	    Array.unobserve = function(object,callback) {
@@ -207,9 +239,9 @@
 					var newkeys = Object.keys(newObject);
 					newkeys.forEach(function(key) {
 						if(!oldObject || (oldObject[key]!==newObject[key])) {
-							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined);
-							var change = (oldvalue===undefined ? "add" : "update");
-							var keypath = path + "." + key;
+							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined),
+								change = (oldvalue===undefined ? "add" : "update"),
+								keypath = path + "." + key;
 							changes.push({name:name,object:rootObject,type:change,oldValue:oldvalue,newValue:newObject[key],keypath:keypath});
 							recurse(name,rootObject,oldvalue,newObject[key],keypath);
 						}
@@ -217,8 +249,8 @@
 				} else if(oldObject instanceof Object) {
 					var oldkeys = Object.keys(oldObject);
 					oldkeys.forEach(function(key) {
-						var change = (newObject===null ? "update" : "delete");
-						var keypath = path + "." + key;
+						var change = (newObject===null ? "update" : "delete"),
+							keypath = path + "." + key;
 						changes.push({name:name,object:rootObject,type:change,oldValue:oldObject[key],newValue:newObject,keypath:keypath});
 						recurse(name,rootObject,oldObject[key],undefined,keypath);
 					});
