@@ -28,6 +28,7 @@
   "homepage": "https://github.com/anywhichway/proxy-observe",
   "devDependencies": {
     "blanket": "^1.2.1",
+    "browserify": "^13.1.1",
     "chai": "^3.4.1",
     "codeclimate-test-reporter": "^0.3.0",
     "istanbul": "^0.4.1",
