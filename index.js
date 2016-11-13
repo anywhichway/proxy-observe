@@ -76,7 +76,7 @@
 	        	}
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -91,7 +91,7 @@
 		        		deliver = this.deliver();
 		        	this.changeset.push(change);
 		        	if(start) {
-		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+		        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 		        	}
 		    	}
 	    	//}
@@ -105,7 +105,7 @@
         			deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -119,7 +119,7 @@
     				deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -132,7 +132,7 @@
 					deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -183,7 +183,7 @@
 	    	        			deliver = proxy.__observer__.deliver();
 	    	    			proxy.__observer__.changeset.push(change);
 	    	    			if(start) {
-	    		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	    		        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	    		        	}
 	    	    		}
 	    	    	}

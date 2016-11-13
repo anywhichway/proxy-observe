@@ -1,6 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 //     proxy-observe v0.0.18
-//
 //     Copyright (c) 2015, 2016 Simon Y. Blackwell, AnyWhichWay
 //     MIT License - http://opensource.org/licenses/mit-license.php
 (function() {
@@ -78,7 +77,7 @@
 	        	}
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -93,7 +92,7 @@
 		        		deliver = this.deliver();
 		        	this.changeset.push(change);
 		        	if(start) {
-		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+		        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 		        	}
 		    	}
 	    	//}
@@ -107,7 +106,7 @@
         			deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -121,7 +120,7 @@
     				deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -134,7 +133,7 @@
 					deliver = this.deliver();
 	        	this.changeset.push(change);
 	        	if(start) {
-	        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	        	}
 	    	}
 	    	return true;
@@ -158,7 +157,6 @@
 	    		});
 	    	}
 	    };
-	   
 	    Array.observe = function(object,callback,acceptlist,pausable,pause,delay) {
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
@@ -186,7 +184,7 @@
 	    	        			deliver = proxy.__observer__.deliver();
 	    	    			proxy.__observer__.changeset.push(change);
 	    	    			if(start) {
-	    		        		deliver(false,(typeof(deliver.delay)==="number" ? delay : 10));
+	    		        		deliver(false,(typeof(deliver.delay)==="number" ? deliver.delay : 10));
 	    		        	}
 	    	    		}
 	    	    	}
