@@ -32,6 +32,7 @@
     "chai": "^3.4.1",
     "codeclimate-test-reporter": "^0.3.0",
     "istanbul": "^0.4.1",
+    "minify": "^2.0.13",
     "mocha": "^2.3.4"
   }
 }
