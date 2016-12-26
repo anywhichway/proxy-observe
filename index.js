@@ -160,6 +160,7 @@
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
+            	acceptlist = acceptlist || ["add", "update", "delete", "splice"];
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
 	    		if(property==="unobserve") {
 		    		return function(callback) {
