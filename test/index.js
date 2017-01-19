@@ -130,6 +130,24 @@ describe('Object', function() {
 		var so = to.subobject;
 		so.subsubobject.newProperty = true;
 	});
+	it('should support deepObserve add new and update existing one', function(done) {
+		var to = {};
+		function onAdd(changes) {
+			changes.every(function(change) {
+				if (change.type==="update") {
+					expect(change.name==="newProperty" && change.object.newProperty===false).to.be.true;
+					expect(change.keypath==="subobject.subsubobject.newProperty").to.be.true;
+					done();
+				}
+			});
+		}
+		to = Object.deepObserve(to,onAdd);
+
+		to.subobject = {};
+		to.subobject.subsubobject = {};
+		to.subobject.subsubobject.newProperty = true;
+		to.subobject.subsubobject.newProperty = false;
+	});
 	it('should support deepObserve update ', function(done) {
 		var to = {subobject:{newProperty:true}};
 		function onUpdate(changes) {
