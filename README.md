@@ -86,6 +86,8 @@ v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
 
+v0.0.20 2017-01-21 Fixed issue #16. Thanks @vitormsilva!
+
 v0.0.19 2016-11-13 Fixed issue 15 where "delay" was undefined.
 
 v0.0.18 2016-07-22 Ehanced to take a 6th argument, `delay`, to set delivery timeout on changes in milliseconds. Also reduced CPU load by making the delivery function "smart". Delivery no longer creates timeout calls if there is nothing to deliver. The next change to an object will restart the delivery function with the previous delay setting.

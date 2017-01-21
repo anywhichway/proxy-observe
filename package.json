@@ -1,6 +1,6 @@
 {
   "name": "proxy-observe",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "private": false,
   "isomorphic": true,
   "description": "A Proxy Based Implementation Of Object.observe plus Object.deepObserve",
@@ -9,7 +9,7 @@
   "scripts": {
     "test": "istanbul cover node_modules/mocha/bin/_mocha --report lcov -- -R spec",
     "browserify": "browserify index.js -o browser/proxy-observe.js",
-    "minify": "minify browser/proxy-observe.js",
+    "minify": "minify --output browser/proxy-observe.min.js browser/proxy-observe.js",
     "prepublish": "npm run browserify && npm run minify"
   },
   "repository": {

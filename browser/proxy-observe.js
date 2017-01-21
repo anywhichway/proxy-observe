@@ -161,6 +161,7 @@
 	    	if(!(object instanceof Array) && !Array.isArray(object)) {
 	    		throw new TypeError("First argument to Array.observer is not an Array");
 	    	}
+            	acceptlist = acceptlist || ["add", "update", "delete", "splice"];
 	    	var arrayproxy = new Proxy(object,{get: function(target,property) {
 	    		if(property==="unobserve") {
 		    		return function(callback) {
@@ -224,15 +225,22 @@
 	    }
 	}
 	Object.deepObserve = function(object,callback,parts) {
+
 		parts = (parts ? parts : []);
-		var keys = Object.keys(object);
-		keys.forEach(function(key) {
-			if(object[key] instanceof Object) {
-				var newparts = parts.slice(0);
-				newparts.push(key);
-				object[key] = Object.deepObserve(object[key],callback,newparts);
-			}
-		});
+
+		function reobserve(value, parts) {
+			var keys = Object.keys(value);
+			keys.forEach(function(key) {
+				if(value[key] instanceof Object) {
+					var newparts = parts.slice(0);
+					newparts.push(key);
+					value[key] = Object.deepObserve(value[key],callback,newparts);
+				}
+			});
+		}
+
+		reobserve(object, parts);
+
 		var observed = Object.observe(object,function(changeset) {
 			var changes = [];
 			function recurse(name,rootObject,oldObject,newObject,path) {
@@ -243,6 +251,7 @@
 							var oldvalue = (oldObject && oldObject[key]!==undefined ? oldObject[key] : undefined),
 								change = (oldvalue===undefined ? "add" : "update"),
 								keypath = path + "." + key;
+
 							changes.push({name:name,object:rootObject,type:change,oldValue:oldvalue,newValue:newObject[key],keypath:keypath});
 							recurse(name,rootObject,oldvalue,newObject[key],keypath);
 						}
@@ -252,6 +261,7 @@
 					oldkeys.forEach(function(key) {
 						var change = (newObject===null ? "update" : "delete"),
 							keypath = path + "." + key;
+							
 						changes.push({name:name,object:rootObject,type:change,oldValue:oldObject[key],newValue:newObject,keypath:keypath});
 						recurse(name,rootObject,oldObject[key],undefined,keypath);
 					});
@@ -259,6 +269,7 @@
 			}
 			changeset.forEach(function(change) {
 				var keypath = (parts.length>0 ? parts.join(".") + "." : "") + change.name;
+				if (change.type === "update" || change.type === "add") reobserve(change.object, parts);
 				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:keypath});
 				recurse(change.name,change.object,change.oldValue,change.object[change.name],keypath);
 			});
@@ -267,4 +278,5 @@
 		return observed;
 	};
 })();
+
 },{}]},{},[1]);
