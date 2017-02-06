@@ -86,6 +86,8 @@ v0.0.12 setPrototypeOf observing does not work in Firefox.
 
 # Release History
 
+v0.0.21 2017-02-06 Enhancements: check the type of objects (object, array, date, etc), check if the new object already have an proxy based on ('observers') Thanks @vitormsilva!
+
 v0.0.20 2017-01-21 Fixed issue #16. Thanks @vitormsilva!
 
 v0.0.19 2016-11-13 Fixed issue 15 where "delay" was undefined.
