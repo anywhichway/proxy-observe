@@ -228,10 +228,14 @@
 
 		parts = (parts ? parts : []);
 
+		var toTypeName = function(obj) {
+			return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+		}
+
 		function reobserve(value, parts) {
 			var keys = Object.keys(value);
 			keys.forEach(function(key) {
-				if(value[key] instanceof Object) {
+				if((toTypeName(value[key]) === 'object' || toTypeName(value[key]) === 'array') && !value[key].hasOwnProperty('__observers__')) {
 					var newparts = parts.slice(0);
 					newparts.push(key);
 					value[key] = Object.deepObserve(value[key],callback,newparts);
@@ -269,7 +273,11 @@
 			}
 			changeset.forEach(function(change) {
 				var keypath = (parts.length>0 ? parts.join(".") + "." : "") + change.name;
-				if (change.type === "update" || change.type === "add") reobserve(change.object, parts);
+
+				if (change.type === "update" || change.type === "add") { 
+					reobserve(change.object, parts);
+				}
+
 				changes.push({name:change.name,object:change.object,type:change.type,oldValue:change.oldValue,newValue:change.object[change.name],keypath:keypath});
 				recurse(change.name,change.object,change.oldValue,change.object[change.name],keypath);
 			});

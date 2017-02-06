@@ -9,7 +9,7 @@
   "scripts": {
     "test": "istanbul cover node_modules/mocha/bin/_mocha --report lcov -- -R spec",
     "browserify": "browserify index.js -o browser/proxy-observe.js",
-    "minify": "minify --output browser/proxy-observe.min.js browser/proxy-observe.js",
+    "minify": "minify browser/proxy-observe.js > browser/proxy-observe.min.js",
     "prepublish": "npm run browserify && npm run minify"
   },
   "repository": {
