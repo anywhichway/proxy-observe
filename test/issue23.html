@@ -1,0 +1,16 @@
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" media="all" href="../node_modules/mocha/mocha.css">
+</head>
+<body>
+<script src="../browser/proxy-observe.js" type="text/javascript" data-cover></script>
+<script>
+var object = { foo: null };
+object = Object.observe(object, function(changeset) {
+    console.log(changeset)
+});
+object.foo = "bar";
+</script>
+</body>
+</html>
